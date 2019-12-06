@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-export const Todo = () => {
-	const [list, setList] = useState([]);
+export const Todo = props => {
+	const [list, setList] = useState(props.initiallist);
 	var empty = "";
 
 	if (list.length == 0) {
@@ -12,6 +13,7 @@ export const Todo = () => {
 			var holder = e.target.value;
 			var x = list.concat([holder]);
 			setList(x);
+			optimise(x);
 		}
 	}
 	function tobedeleted(e) {
@@ -25,8 +27,23 @@ export const Todo = () => {
 		});
 
 		setList(filteredOne);
+		optimise(filteredOne);
 	}
-
+	function optimise(singleValue) {
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/lcsbharathi5", {
+			method: "PUT",
+			body: JSON.stringify(
+				singleValue.map(item => {
+					return { label: item, done: false };
+				})
+			),
+			headers: {
+				"Content-type": "application/json"
+			}
+		}).then(responseoftodo => {
+			return responseoftodo.json();
+		});
+	}
 	return (
 		<div className="todocontainer">
 			<div className="header">
@@ -58,4 +75,7 @@ export const Todo = () => {
 			</div>
 		</div>
 	);
+};
+Todo.propTypes = {
+	initiallist: PropTypes.array
 };
